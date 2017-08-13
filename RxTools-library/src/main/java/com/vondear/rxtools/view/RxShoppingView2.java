@@ -28,6 +28,7 @@ public class RxShoppingView2 extends RxShoppingView {
                     if (isPointInCircle(new PointF(event.getX(), event.getY()), new PointF(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2), MAX_HEIGHT / 2)) {
                         mNum = 1;
                         startMoveAnim();
+                        startScaleAnim(true);
                         if (mShoppingClickListener != null) {
                             mShoppingClickListener.onAddClick(mNum);
                         }

@@ -14,6 +14,7 @@ import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -59,8 +60,11 @@ public class RxShoppingView extends View {
 
     protected int MAX_WIDTH;
     protected int MAX_HEIGHT;
+    protected int PADDING = 10;//为按钮变大变小动画而设置
 
     protected ShoppingClickListener mShoppingClickListener;
+    protected float mAddScale = 1.0f;
+    protected float mMinusScale = 1.0f;
 
     public RxShoppingView(Context context) {
         this(context, null);
@@ -120,7 +124,7 @@ public class RxShoppingView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(MAX_WIDTH, MAX_HEIGHT);
+        setMeasuredDimension(MAX_WIDTH + PADDING, MAX_HEIGHT + PADDING);
     }
 
     @Override
@@ -181,6 +185,7 @@ public class RxShoppingView extends View {
                             if (mShoppingClickListener != null) {
                                 mShoppingClickListener.onAddClick(mNum);
                             }
+                            startScaleAnim(true);
                             invalidate();
                             return true;
                         }
@@ -191,6 +196,7 @@ public class RxShoppingView extends View {
                             if (mShoppingClickListener != null) {
                                 mShoppingClickListener.onMinusClick(mNum);
                             }
+                            startScaleAnim(false);
                             invalidate();
                         } else {
                             if (mShoppingClickListener != null) {
@@ -234,7 +240,11 @@ public class RxShoppingView extends View {
      * @param canvas 画板
      */
     protected void drawAddBtn(Canvas canvas) {
-        canvas.drawCircle(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2, MAX_HEIGHT / 2, mPaintBg);
+
+        float radius = MAX_HEIGHT / 2;
+        radius *= mAddScale;
+
+        canvas.drawCircle(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2, radius, mPaintBg);
         canvas.drawLine(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 4, MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 4 * 3, mPaintText);
         canvas.drawLine(MAX_WIDTH - MAX_HEIGHT / 2 - MAX_HEIGHT / 4, MAX_HEIGHT / 2, MAX_WIDTH - MAX_HEIGHT / 4, MAX_HEIGHT / 2, mPaintText);
     }
@@ -249,8 +259,12 @@ public class RxShoppingView extends View {
         if (angle != 0) {
             canvas.rotate(angle, mMinusBtnPosition, MAX_HEIGHT / 2);
         }
-        canvas.drawCircle(mMinusBtnPosition, MAX_HEIGHT / 2, MAX_HEIGHT / 2 - MAX_HEIGHT / 20, mPaintMinus);
-        canvas.drawLine(mMinusBtnPosition - MAX_HEIGHT / 4, MAX_HEIGHT / 2, mMinusBtnPosition + MAX_HEIGHT / 4, MAX_HEIGHT / 2, mPaintMinus);
+        float radius = MAX_HEIGHT / 2 - MAX_HEIGHT / 20;
+        radius *= mMinusScale;
+
+        canvas.drawCircle(mMinusBtnPosition, MAX_HEIGHT / 2, radius, mPaintMinus);
+        canvas.drawLine(mMinusBtnPosition - MAX_HEIGHT / 4, MAX_HEIGHT / 2,
+                mMinusBtnPosition + MAX_HEIGHT / 4, MAX_HEIGHT / 2, mPaintMinus);
         if (angle != 0) {
             canvas.rotate(-angle, mMinusBtnPosition, MAX_HEIGHT / 2);
         }
@@ -283,6 +297,30 @@ public class RxShoppingView extends View {
         if (angle != 0) {
             canvas.rotate(-angle, x, y);
         }
+    }
+
+    /**
+     * 开始移动动画
+     */
+    protected void startScaleAnim(final boolean isAdd) {
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat(1f, 1.2f, 1f);
+
+        valueAnimator.setDuration(mDuration);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                if (isAdd) {
+                    mAddScale = (Float) valueAnimator.getAnimatedValue();
+                    Log.e("startScaleAnim", mAddScale + "");
+                } else {
+                    mMinusScale = (Float) valueAnimator.getAnimatedValue();
+                    Log.e("startScaleAnim", mMinusScale + "");
+                }
+
+                invalidate();
+            }
+        });
+        valueAnimator.start();
     }
 
     /**
