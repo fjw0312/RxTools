@@ -87,5 +87,7 @@
         android:textColor="@color/white"
         android:textSize="10sp"
         android:textStyle="bold"
-        android:visibility="gone"/>
+        tools:visibility="visible"
+        android:visibility="gone"
+    />
 </RelativeLayout>

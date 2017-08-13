@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -25,57 +24,57 @@ import java.util.Collection;
 /**
  * @author Vondear on 16/7/10 17:59
  */
-public class RxShoppingView extends View {
+public class RxShoppingView1 extends View {
 
-    protected final static int STATE_NONE = 0;
-    protected final static int STATE_MOVE = 1;
-    protected final static int STATE_MOVE_OVER = 2;
-    protected final static int STATE_ROTATE = 3;
-    protected final static int STATE_ROTATE_OVER = 4;
+    private final static int STATE_NONE = 0;
+    private final static int STATE_MOVE = 1;
+    private final static int STATE_MOVE_OVER = 2;
+    private final static int STATE_ROTATE = 3;
+    private final static int STATE_ROTATE_OVER = 4;
 
-    protected final static int DEFAULT_DURATION = 5000;
-    protected final static String DEFAULT_SHOPPING_TEXT = "加入购物车";
+    private final static int DEFAULT_DURATION = 5000;
+    private final static String DEFAULT_SHOPPING_TEXT = "加入购物车";
 
-    protected Paint mPaintBg, mPaintText, mPaintNum;
-    protected Paint mPaintMinus;
+    private Paint mPaintBg, mPaintText, mPaintNum;
+    private Paint mPaintMinus;
 
     //是否是向前状态（= = 名字不好取，意思就是区分向前和回退状态）
-    protected boolean mIsBack = true;
+    private boolean mIsBack = true;
     //动画时长
-    protected int mDuration;
+    private int mDuration;
     //购买数量
-    protected int mNum = 0;
+    private int mNum = 0;
     //展示文案
-    protected String mShoppingText;
+    private String mShoppingText;
     //当前状态
-    protected int mState = STATE_NONE;
+    private int mState = STATE_NONE;
 
     //属性值
-    protected int mWidth = 0;
-    protected int mAngle = 0;
-    protected int mTextPosition = 0;
-    protected int mMinusBtnPosition = 0;
-    protected int mAlpha = 0;
+    private int mWidth = 0;
+    private int mAngle = 0;
+    private int mTextPosition = 0;
+    private int mMinusBtnPosition = 0;
+    private int mAlpha = 0;
 
-    protected int MAX_WIDTH;
-    protected int MAX_HEIGHT;
+    private int MAX_WIDTH;
+    private int MAX_HEIGHT;
 
-    protected ShoppingClickListener mShoppingClickListener;
+    private ShoppingClickListener mShoppingClickListener;
 
-    public RxShoppingView(Context context) {
+    public RxShoppingView1(Context context) {
         this(context, null);
     }
 
-    public RxShoppingView(Context context, AttributeSet attrs) {
+    public RxShoppingView1(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public RxShoppingView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public RxShoppingView1(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(attrs);
     }
 
-    protected void init(AttributeSet attrs) {
+    private void init(AttributeSet attrs) {
 
         TypedArray typeArray = getContext().obtainStyledAttributes(attrs,
                 R.styleable.ShoppingView);
@@ -129,7 +128,7 @@ public class RxShoppingView extends View {
 
         if (mState == STATE_NONE) {
             drawBgMove(canvas);
-            drawShoppingText(canvas);
+            // drawShoppingText(canvas);//删除
         } else if (mState == STATE_MOVE) {
             drawBgMove(canvas);
         } else if (mState == STATE_MOVE_OVER) {
@@ -139,7 +138,7 @@ public class RxShoppingView extends View {
                 startRotateAnim();
             } else {
                 drawBgMove(canvas);
-                drawShoppingText(canvas);
+                // drawShoppingText(canvas);//删除
                 mState = STATE_NONE;
                 mIsBack = true;
                 mNum = 0;
@@ -165,13 +164,14 @@ public class RxShoppingView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
 
-                if (mState == STATE_NONE) {
-                    mNum = 1;
-                    startMoveAnim();
-                    if (mShoppingClickListener != null) {
-                        mShoppingClickListener.onAddClick(mNum);
+                if (mState == STATE_NONE) {//修改
+                    if (isPointInCircle(new PointF(event.getX(), event.getY()), new PointF(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2), MAX_HEIGHT / 2)) {
+                        mNum = 1;
+                        startMoveAnim();
+                        if (mShoppingClickListener != null) {
+                            mShoppingClickListener.onAddClick(mNum);
+                        }
                     }
-                    return true;
                 } else if (mState == STATE_ROTATE_OVER) {
                     if (isPointInCircle(new PointF(event.getX(), event.getY()), new PointF(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2), MAX_HEIGHT / 2)) {
                         //添加
@@ -181,9 +181,8 @@ public class RxShoppingView extends View {
                             if (mShoppingClickListener != null) {
                                 mShoppingClickListener.onAddClick(mNum);
                             }
-                            invalidate();
-                            return true;
                         }
+                        invalidate();
                     } else if (isPointInCircle(new PointF(event.getX(), event.getY()), new PointF(MAX_HEIGHT / 2, MAX_HEIGHT / 2), MAX_HEIGHT / 2)) {
                         //减少
                         if (mNum > 1) {
@@ -200,9 +199,10 @@ public class RxShoppingView extends View {
                             mIsBack = false;
                             startRotateAnim();
                         }
-                        return true;
                     }
                 }
+
+                return true;
         }
         return super.onTouchEvent(event);
     }
@@ -212,10 +212,11 @@ public class RxShoppingView extends View {
      *
      * @param canvas 画板
      */
-    protected void drawBgMove(Canvas canvas) {
-        canvas.drawArc(new RectF(mWidth, 0, mWidth + MAX_HEIGHT, MAX_HEIGHT), 90, 180, false, mPaintBg);
-        canvas.drawRect(new RectF(mWidth + MAX_HEIGHT / 2, 0, MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT), mPaintBg);
-        canvas.drawArc(new RectF(MAX_WIDTH - MAX_HEIGHT, 0, MAX_WIDTH, MAX_HEIGHT), 180, 270, false, mPaintBg);
+    private void drawBgMove(Canvas canvas) {
+        // canvas.drawArc(new RectF(mWidth, 0, mWidth + MAX_HEIGHT, MAX_HEIGHT), 90, 180, false, mPaintBg);
+        // canvas.drawRect(new RectF(mWidth + MAX_HEIGHT / 2, 0, MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT), mPaintBg);
+        // canvas.drawArc(new RectF(MAX_WIDTH - MAX_HEIGHT, 0, MAX_WIDTH, MAX_HEIGHT), 180, 270, false, mPaintBg);
+        drawAddBtn(canvas);//修改
     }
 
     /**
@@ -223,7 +224,7 @@ public class RxShoppingView extends View {
      *
      * @param canvas 画板
      */
-    protected void drawShoppingText(Canvas canvas) {
+    private void drawShoppingText(Canvas canvas) {
         canvas.drawText(mShoppingText, MAX_WIDTH / 2 - getTextWidth(mPaintText, mShoppingText) / 2f,
                 MAX_HEIGHT / 2 + getTextHeight(mShoppingText, mPaintText) / 2f, mPaintText);
     }
@@ -233,7 +234,7 @@ public class RxShoppingView extends View {
      *
      * @param canvas 画板
      */
-    protected void drawAddBtn(Canvas canvas) {
+    private void drawAddBtn(Canvas canvas) {
         canvas.drawCircle(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 2, MAX_HEIGHT / 2, mPaintBg);
         canvas.drawLine(MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 4, MAX_WIDTH - MAX_HEIGHT / 2, MAX_HEIGHT / 4 * 3, mPaintText);
         canvas.drawLine(MAX_WIDTH - MAX_HEIGHT / 2 - MAX_HEIGHT / 4, MAX_HEIGHT / 2, MAX_WIDTH - MAX_HEIGHT / 4, MAX_HEIGHT / 2, mPaintText);
@@ -245,7 +246,7 @@ public class RxShoppingView extends View {
      * @param canvas 画板
      * @param angle  旋转角度
      */
-    protected void drawMinusBtn(Canvas canvas, float angle) {
+    private void drawMinusBtn(Canvas canvas, float angle) {
         if (angle != 0) {
             canvas.rotate(angle, mMinusBtnPosition, MAX_HEIGHT / 2);
         }
@@ -261,7 +262,7 @@ public class RxShoppingView extends View {
      *
      * @param canvas 画板
      */
-    protected void drawNumText(Canvas canvas) {
+    private void drawNumText(Canvas canvas) {
         drawText(canvas, String.valueOf(mNum), mTextPosition - getTextWidth(mPaintNum, String.valueOf(mNum)) / 2f, MAX_HEIGHT / 2 + getTextHeight(String.valueOf(mNum), mPaintNum) / 2f, mPaintNum, mAngle);
     }
 
@@ -275,7 +276,7 @@ public class RxShoppingView extends View {
      * @param paint  画笔
      * @param angle  旋转角度
      */
-    protected void drawText(Canvas canvas, String text, float x, float y, Paint paint, float angle) {
+    private void drawText(Canvas canvas, String text, float x, float y, Paint paint, float angle) {
         if (angle != 0) {
             canvas.rotate(angle, x, y);
         }
@@ -288,7 +289,7 @@ public class RxShoppingView extends View {
     /**
      * 开始移动动画
      */
-    protected void startMoveAnim() {
+    private void startMoveAnim() {
         mState = STATE_MOVE;
         ValueAnimator valueAnimator;
         final int move = MAX_WIDTH - MAX_HEIGHT;
@@ -323,7 +324,7 @@ public class RxShoppingView extends View {
     /**
      * 开始旋转动画
      */
-    protected void startRotateAnim() {
+    private void startRotateAnim() {
         mState = STATE_ROTATE;
 
         Collection<Animator> animatorList = new ArrayList<>();
@@ -451,12 +452,7 @@ public class RxShoppingView extends View {
      */
     public void setTextNum(int num) {
         mNum = num;
-        if (mNum == 0) {
-            mState = STATE_NONE;
-        } else {
-            mState = STATE_ROTATE_OVER;
-        }
-
+        mState = STATE_ROTATE_OVER;
         invalidate();
     }
 
@@ -472,24 +468,24 @@ public class RxShoppingView extends View {
      * @param radius 半径
      * @return true在圆内
      */
-    protected boolean isPointInCircle(PointF pointF, PointF circle, float radius) {
+    private boolean isPointInCircle(PointF pointF, PointF circle, float radius) {
         return Math.pow((pointF.x - circle.x), 2) + Math.pow((pointF.y - circle.y), 2) <= Math.pow(radius, 2);
     }
 
-    protected int sp2px(float spValue) {
+    private int sp2px(float spValue) {
         final float fontScale = getContext().getResources().getDisplayMetrics().scaledDensity;
         return (int) (spValue * fontScale + 0.5f);
     }
 
     //获取Text高度
-    protected int getTextHeight(String str, Paint paint) {
+    private int getTextHeight(String str, Paint paint) {
         Rect rect = new Rect();
         paint.getTextBounds(str, 0, str.length(), rect);
         return (int) (rect.height() / 33f * 29);
     }
 
     //获取Text宽度
-    protected int getTextWidth(Paint paint, String str) {
+    private int getTextWidth(Paint paint, String str) {
         int iRet = 0;
         if (str != null && str.length() > 0) {
             int len = str.length();

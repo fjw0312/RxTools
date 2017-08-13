@@ -43,7 +43,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
-import static com.vondear.rxtools.view.dialog.RxDialogChooseImage.LayoutType.TITLE;
+import static com.vondear.rxtools.view.dialog.RxDialogChooseImage.LayoutType.NO_TITLE;
 
 public class ActivityRxPhoto extends ActivityBase {
 
@@ -99,7 +99,7 @@ public class ActivityRxPhoto extends ActivityBase {
         mIvAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                initDialogOpenAvatar();
+               // initDialogOpenAvatar();
                 initDialogChooseImage();
             }
         });
@@ -164,7 +164,7 @@ public class ActivityRxPhoto extends ActivityBase {
     }
 
     private void initDialogChooseImage() {
-        RxDialogChooseImage dialogChooseImage = new RxDialogChooseImage(mContext, TITLE);
+        RxDialogChooseImage dialogChooseImage = new RxDialogChooseImage(mContext, NO_TITLE);
 
         dialogChooseImage.show();
     }

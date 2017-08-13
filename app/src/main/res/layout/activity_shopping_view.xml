@@ -41,7 +41,7 @@
         app:sv_text="SHOPPING"
         app:sv_text_size="22sp" />
 
-    <com.vondear.rxtools.view.RxShoppingView
+    <com.vondear.rxtools.view.RxShoppingView2
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"

@@ -32,8 +32,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.vondear.tools.R.id.service;
-
 public class ActivityLoginAct extends ActivityBase {
 
     @BindView(R.id.logo)
@@ -58,7 +56,7 @@ public class ActivityLoginAct extends ActivityBase {
     LinearLayout mContent;
     @BindView(R.id.scrollView)
     ScrollView mScrollView;
-    @BindView(service)
+    @BindView(R.id.service)
     LinearLayout mService;
     @BindView(R.id.root)
     RelativeLayout mRoot;
